@@ -1,16 +1,15 @@
 class MoviesController < ApplicationController
+  wrap_parameters false
   def index
     movies = Movie.all
     render json: movies
   end
 
   def create
-    movie = Movie.create(movie_params)
-    if movie.valid?
+    movie = Movie.create!(movie_params)
     render json: movie, status: :created
-   else
-    render json: { errors: movie.errors.full_messages }, status: :unprocessable_entity
-   end
+  rescue ActiveRecord::RecordInvalid=>invalid
+    render json: { errors: invalid.record.errors.full_messages }, status: :unprocessable_entity
   end
 
   private
